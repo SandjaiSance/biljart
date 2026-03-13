@@ -305,6 +305,10 @@ function fmt(v) {
   return v.toFixed(3).replace('.', ',');
 }
 
+function fmtDoel(v) {
+  return v.toFixed(2).replace('.', ',');
+}
+
 function gemPerSpeler(week) {
   return spelers.map((_, i) => gem(week.partijen.map(p => p[i])));
 }
@@ -328,7 +332,7 @@ function buildRanking() {
     html += `<div class="ranking-item rank-${i+1}">
       <span class="rank-nr">${i+1}</span>
       <span class="rank-naam-wrap">
-        <span class="rank-naam">${s.naam} <span class="rank-doel">(doel: ${fmt(s.streef)})</span></span>
+        <span class="rank-naam">${s.naam} <span class="rank-doel">(doel: ${fmtDoel(s.streef)})</span></span>
       </span>
       <span class="rank-gem">${fmt(s.gem)}</span>
     </div>`;
