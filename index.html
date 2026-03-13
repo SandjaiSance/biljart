@@ -86,8 +86,8 @@
       align-items: center;
       background: #1e3a1e;
       border-radius: 8px;
-      padding: 10px 14px;
-      gap: 12px;
+      padding: 10px 12px;
+      gap: 8px;
     }
 
     .ranking-item.rank-1 { border-left: 4px solid #ffd700; }
@@ -104,24 +104,27 @@
     }
 
     .rank-naam {
-      font-size: 1rem;
+      font-size: 0.92rem;
       text-transform: capitalize;
       color: #e8f5e9;
+      white-space: nowrap;
     }
 
     .rank-naam-wrap {
       flex: 1;
+      min-width: 0;
     }
 
     .rank-doel {
       color: #9ccc65;
-      font-size: 0.92rem;
+      font-size: 0.82rem;
     }
 
     .rank-gem {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: bold;
       color: #a5d6a7;
+      flex-shrink: 0;
     }
 
     /* Week kaarten */
