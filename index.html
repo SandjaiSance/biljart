@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biljart Moyenne 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a2e1a;
+      color: #e8f5e9;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0 24px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      color: #a5d6a7;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: #81c784;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    .status-bar {
+      margin: 0 auto 18px;
+      max-width: 520px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      text-align: center;
+      background: #203520;
+      color: #c5e1a5;
+      border: 1px solid #3f6b3f;
+    }
+
+    .status-bar.warning {
+      background: #3b2d12;
+      color: #ffe082;
+      border-color: #8d6e63;
+    }
+
+
+    /* Totaalstand */
+    .totaal-card {
+      background: #2e4a2e;
+      border: 1px solid #4caf50;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .totaal-card h2 {
+      color: #a5d6a7;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .ranking {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      background: #1e3a1e;
+      border-radius: 8px;
+      padding: 10px 14px;
+      gap: 12px;
+    }
+
+    .ranking-item.rank-1 { border-left: 4px solid #ffd700; }
+    .ranking-item.rank-2 { border-left: 4px solid #c0c0c0; }
+    .ranking-item.rank-3 { border-left: 4px solid #cd7f32; }
+    .ranking-item.rank-4 { border-left: 4px solid #555; }
+
+    .rank-nr {
+      font-size: 1.2rem;
+      font-weight: bold;
+      width: 24px;
+      text-align: center;
+      color: #81c784;
+    }
+
+    .rank-naam {
+      font-size: 1rem;
+      text-transform: capitalize;
+      color: #e8f5e9;
+    }
+
+    .rank-naam-wrap {
+      flex: 1;
+    }
+
+    .rank-doel {
+      color: #9ccc65;
+      font-size: 0.92rem;
+    }
+
+    .rank-gem {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #a5d6a7;
+    }
+
+    /* Week kaarten */
+    .week-card {
+      background: #243b24;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      cursor: pointer;
+    }
+
+    .week-datum {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #a5d6a7;
+    }
+
+    .week-toggle {
+      color: #81c784;
+      font-size: 1.2rem;
+      user-select: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    thead tr {
+      background: #1e3a1e;
+    }
+
+    th {
+      padding: 8px 10px;
+      text-align: center;
+      color: #81c784;
+      font-size: 0.82rem;
+      text-transform: capitalize;
+      letter-spacing: 0.5px;
+    }
+
+    th:first-child { text-align: left; }
+
+    td {
+      padding: 8px 10px;
+      text-align: center;
+      border-bottom: 1px solid #2e4a2e;
+    }
+
+    td:first-child {
+      text-align: left;
+      color: #9e9e9e;
+      font-size: 0.82rem;
+    }
+
+    tr.gem-row td {
+      background: #1e3a1e;
+      color: #a5d6a7;
+      font-weight: bold;
+      border-bottom: none;
+      font-size: 0.92rem;
+    }
+
+    tr.gem-row td:first-child {
+      color: #a5d6a7;
+    }
+
+    .best { color: #ffd700; font-weight: bold; }
+
+    .gem-row td.best-1 {
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.35);
+    }
+
+    .gem-row td.best-2 {
+      color: #cfd8dc;
+      font-weight: bold;
+    }
+
+    .gem-row td.best-3 {
+      color: #cd7f32;
+      font-weight: bold;
+    }
+
+    .content { display: block; }
+    .content.collapsed { display: none; }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎱 Driebanden Moyenne 2026</h1>
+  <p>3-banden · Vrijdag</p>
+</header>
+
+<div id="status" class="status-bar"></div>
+<div id="app"></div>
+
+<script src="site-data.js"></script>
+<script>
+const spelers = ['sandjai', 'kris', 'bhajo', 'emiel'];
+const streefGemiddelde = {
+  sandjai: 0.5,
+  kris: 0.5,
+  bhajo: 0.5,
+  emiel: 1.0,
+};
+
+const fallbackWekenData = [
+  {
+    datum: '20 maart 2026',
+    partijen: [
+      [0, 0, 0, 0],
+    ]
+  },
+  {
+    datum: '13 maart 2026',
+    partijen: [
+      [0, 0, 0, 0],
+    ]
+  },
+  {
+    datum: '6 maart 2026',
+    partijen: [
+      [0.433333333, 0.6, 0.066666667, 0.7],
+      [0.233333333, 0.366666667, 0.6, 0.533333333],
+      [0.166666667, 0.6, 0.366666667, 0.766666667],
+    ]
+  },
+  {
+    datum: '27 februari 2026',
+    partijen: [
+      [0.233333333, 0.366666667, 0.166666667, 0.7],
+      [0.5, 0.233333333, 0.133333333, 0.466666667],
+      [0.4, 0.533333333, 0.3, 0.533333333],
+    ]
+  },
+  {
+    datum: '20 februari 2026',
+    partijen: [
+      [0.333333333, 0.133333333, 0.033333333, 0.533333333],
+      [0.3, 0.133333333, 0.333333333, 0.333333333],
+      [0.4, 0.1, 0.533333333, 0.7],
+      [0.266666667, 0.433333333, 0.3, 0.233333333],
+    ]
+  }
+];
+
+const externeData = window.BILJART_SITE_DATA || null;
+let wekenData = externeData?.weeks || fallbackWekenData;
+const gebruiktFallback = !externeData;
+const statusTekst = gebruiktFallback
+  ? 'Lokale fallback-data actief. Draai .\\update-site.ps1 na Excel-wijzigingen.'
+  : `Excel bron: ${externeData.sourceFile} · bijgewerkt: ${externeData.generatedAt}`;
+
+function gem(arr) {
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+function fmt(v) {
+  return v.toFixed(3).replace('.', ',');
+}
+
+function gemPerSpeler(week) {
+  return spelers.map((_, i) => gem(week.partijen.map(p => p[i])));
+}
+
+function totaalGem() {
+  const allePartijen = wekenData.flatMap(w => w.partijen);
+  return spelers.map((_, i) => gem(allePartijen.map(p => p[i])));
+}
+
+function buildRanking() {
+  const gems = totaalGem();
+  const ranked = spelers.map((naam, i) => ({
+    naam,
+    gem: gems[i],
+    streef: streefGemiddelde[naam],
+  }))
+    .sort((a, b) => b.gem - a.gem);
+
+  let html = '<div class="totaal-card"><h2>Totaalstand</h2><div class="ranking">';
+  ranked.forEach((s, i) => {
+    html += `<div class="ranking-item rank-${i+1}">
+      <span class="rank-nr">${i+1}</span>
+      <span class="rank-naam-wrap">
+        <span class="rank-naam">${s.naam} <span class="rank-doel">(doel: ${fmt(s.streef)})</span></span>
+      </span>
+      <span class="rank-gem">${fmt(s.gem)}</span>
+    </div>`;
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function buildWeek(week, idx) {
+  const gems = gemPerSpeler(week);
+  const ranking = gems
+    .map((value, playerIdx) => ({ value, playerIdx }))
+    .sort((a, b) => b.value - a.value);
+  const firstIdx = ranking[0]?.playerIdx;
+  const secondIdx = ranking[1]?.playerIdx;
+  const thirdIdx = ranking[2]?.playerIdx;
+
+  let html = `<div class="week-card">
+    <div class="week-header" onclick="toggle(${idx})">
+      <span class="week-datum">📅 ${week.datum}</span>
+      <span class="week-toggle" id="toggle-${idx}">▼</span>
+    </div>
+    <div class="content" id="content-${idx}">
+    <table>
+      <thead>
+        <tr>
+          ${spelers.map(s => `<th>${s}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>`;
+
+  html += `<tr class="gem-row">`;
+  gems.forEach((v, i) => {
+    const cls = i === firstIdx ? 'best-1' : (i === secondIdx ? 'best-2' : (i === thirdIdx ? 'best-3' : ''));
+    html += `<td class="${cls}">${fmt(v)}</td>`;
+  });
+  html += '</tr></tbody></table></div></div>';
+  return html;
+}
+
+function toggle(idx) {
+  const el = document.getElementById(`content-${idx}`);
+  const btn = document.getElementById(`toggle-${idx}`);
+  el.classList.toggle('collapsed');
+  btn.textContent = el.classList.contains('collapsed') ? '▶' : '▼';
+}
+
+const app = document.getElementById('app');
+const statusEl = document.getElementById('status');
+
+function render() {
+  statusEl.textContent = statusTekst;
+  statusEl.className = gebruiktFallback ? 'status-bar warning' : 'status-bar';
+  app.innerHTML = buildRanking() + wekenData.map(buildWeek).join('');
+}
+
+render();
+</script>
+</body>
+</html>
