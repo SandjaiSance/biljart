@@ -330,12 +330,9 @@ function buildRanking() {
 
 function buildWeek(week, idx) {
   const gems = gemPerSpeler(week);
-  const ranking = gems
-    .map((value, playerIdx) => ({ value, playerIdx }))
-    .sort((a, b) => b.value - a.value);
-  const firstIdx = ranking[0]?.playerIdx;
-  const secondIdx = ranking[1]?.playerIdx;
-  const thirdIdx = ranking[2]?.playerIdx;
+  const distinctRanks = [...new Set(gems.map(v => Number(v.toFixed(9))))]
+    .sort((a, b) => b - a)
+    .slice(0, 3);
 
   let html = `<div class="week-card">
     <div class="week-header" onclick="toggle(${idx})">
@@ -353,7 +350,8 @@ function buildWeek(week, idx) {
 
   html += `<tr class="gem-row">`;
   gems.forEach((v, i) => {
-    const cls = i === firstIdx ? 'best-1' : (i === secondIdx ? 'best-2' : (i === thirdIdx ? 'best-3' : ''));
+    const rankIdx = distinctRanks.indexOf(Number(v.toFixed(9)));
+    const cls = rankIdx === 0 ? 'best-1' : (rankIdx === 1 ? 'best-2' : (rankIdx === 2 ? 'best-3' : ''));
     html += `<td class="${cls}">${fmt(v)}</td>`;
   });
   html += '</tr></tbody></table></div></div>';
