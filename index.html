@@ -207,13 +207,22 @@
     }
 
     .gem-row td.best-2 {
-      color: #cfd8dc;
+      color: #f5f7fa;
       font-weight: bold;
+      text-shadow: 0 0 8px rgba(207, 216, 220, 0.45);
     }
 
     .gem-row td.best-3 {
-      color: #cd7f32;
+      color: #e0a96d;
       font-weight: bold;
+      text-shadow: 0 0 8px rgba(205, 127, 50, 0.3);
+    }
+
+    .rank-sup {
+      font-size: 0.62em;
+      vertical-align: super;
+      margin-left: 1px;
+      font-weight: 700;
     }
 
     .content { display: block; }
@@ -352,7 +361,8 @@ function buildWeek(week, idx) {
   gems.forEach((v, i) => {
     const rankIdx = distinctRanks.indexOf(Number(v.toFixed(9)));
     const cls = rankIdx === 0 ? 'best-1' : (rankIdx === 1 ? 'best-2' : (rankIdx === 2 ? 'best-3' : ''));
-    html += `<td class="${cls}">${fmt(v)}</td>`;
+    const sup = rankIdx >= 0 ? `<sup class="rank-sup">${rankIdx + 1}</sup>` : '';
+    html += `<td class="${cls}">${fmt(v)}${sup}</td>`;
   });
   html += '</tr></tbody></table></div></div>';
   return html;
