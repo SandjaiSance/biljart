@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
@@ -224,14 +224,14 @@
 <body>
 
 <header>
-  <h1>🎱 Driebanden Moyenne 2026</h1>
-  <p>3-banden · Vrijdag</p>
+  <h1>Driebanden Moyenne 2026</h1>
+  <p>3-banden - Vrijdag</p>
 </header>
 
 <div id="status" class="status-bar"></div>
 <div id="app"></div>
 
-<script src="site-data.js"></script>
+<script src="site-data.js?v=20260412230441"></script>
 <script>
 const spelers = ['sandjai', 'kris', 'bhajo', 'emiel'];
 const streefGemiddelde = {
@@ -299,7 +299,7 @@ let wekenData = externeData?.weeks || fallbackWekenData;
 const gebruiktFallback = !externeData;
 const statusTekst = gebruiktFallback
   ? 'Lokale fallback-data actief. Draai .\\update-site.ps1 na Excel-wijzigingen.'
-  : `Excel bron: ${externeData.sourceFile} · bijgewerkt: ${externeData.generatedAt}`;
+  : `Excel bron: ${externeData.sourceFile} Â· bijgewerkt: ${externeData.generatedAt}`;
 
 function gem(arr) {
   const values = arr.filter(v => typeof v === 'number' && !Number.isNaN(v));
@@ -360,8 +360,8 @@ function buildWeek(week, idx) {
 
   let html = `<div class="week-card">
     <div class="week-header" onclick="toggle(${idx})">
-      <span class="week-datum">📅 ${week.datum}</span>
-      <span class="week-toggle" id="toggle-${idx}">▼</span>
+      <span class="week-datum">ðŸ“… ${week.datum}</span>
+      <span class="week-toggle" id="toggle-${idx}">â–¼</span>
     </div>
     <div class="content" id="content-${idx}">
     <table>
@@ -387,7 +387,7 @@ function toggle(idx) {
   const el = document.getElementById(`content-${idx}`);
   const btn = document.getElementById(`toggle-${idx}`);
   el.classList.toggle('collapsed');
-  btn.textContent = el.classList.contains('collapsed') ? '▶' : '▼';
+  btn.textContent = el.classList.contains('collapsed') ? 'â–¶' : 'â–¼';
 }
 
 const app = document.getElementById('app');
@@ -403,3 +403,4 @@ render();
 </script>
 </body>
 </html>
+

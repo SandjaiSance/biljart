@@ -77,8 +77,32 @@ function Get-WeekDataFromWorksheet {
         }
 }
 
+function Update-IndexCacheBuster {
+    param(
+        [string]$IndexPath,
+        [string]$VersionToken
+    )
+
+    if (-not (Test-Path -Path $IndexPath)) {
+        return
+    }
+
+    $indexContent = Get-Content -Path $IndexPath -Raw
+    $updatedContent = [regex]::Replace(
+        $indexContent,
+        '<script\s+src="site-data\.js(?:\?v=[^"]*)?"\s*></script>',
+        ('<script src="site-data.js?v=' + $VersionToken + '"></script>'),
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+
+    if ($updatedContent -ne $indexContent) {
+        Set-Content -Path $IndexPath -Value $updatedContent -Encoding UTF8
+    }
+}
+
 $resolvedExcelPath = Resolve-Path -Path $ExcelPath
 $resolvedOutputPath = Join-Path -Path (Split-Path -Parent $resolvedExcelPath) -ChildPath (Split-Path -Leaf $OutputPath)
+$resolvedIndexPath = Join-Path -Path (Split-Path -Parent $resolvedExcelPath) -ChildPath 'index.html'
 
 $excel = $null
 $workbook = $null
@@ -103,6 +127,9 @@ try {
     $json = $payload | ConvertTo-Json -Depth 6
     $jsContent = "window.BILJART_SITE_DATA = $json;"
     Set-Content -Path $resolvedOutputPath -Value $jsContent -Encoding UTF8
+
+    $cacheBustVersion = (Get-Date).ToString('yyyyMMddHHmmss')
+    Update-IndexCacheBuster -IndexPath $resolvedIndexPath -VersionToken $cacheBustVersion
 
     Write-Host "site-data.js bijgewerkt op basis van $([System.IO.Path]::GetFileName($resolvedExcelPath))."
     Write-Host "Datums verwerkt: $($weeks.Count)"

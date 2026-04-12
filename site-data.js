@@ -1,5 +1,5 @@
 ﻿window.BILJART_SITE_DATA = {
-    "generatedAt":  "12-04-2026 22:50",
+    "generatedAt":  "12-04-2026 23:04",
     "sourceFile":  "biljart moyenne.xlsx",
     "weeks":  [
                   {
