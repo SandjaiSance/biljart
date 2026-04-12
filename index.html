@@ -86,8 +86,8 @@
       align-items: center;
       background: #1e3a1e;
       border-radius: 8px;
-      padding: 10px 12px;
-      gap: 8px;
+      padding: 10px 14px;
+      gap: 12px;
     }
 
     .ranking-item.rank-1 { border-left: 4px solid #ffd700; }
@@ -104,27 +104,24 @@
     }
 
     .rank-naam {
-      font-size: 0.92rem;
+      font-size: 1rem;
       text-transform: capitalize;
       color: #e8f5e9;
-      white-space: nowrap;
     }
 
     .rank-naam-wrap {
       flex: 1;
-      min-width: 0;
     }
 
     .rank-doel {
       color: #9ccc65;
-      font-size: 0.82rem;
+      font-size: 0.92rem;
     }
 
     .rank-gem {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: bold;
       color: #a5d6a7;
-      flex-shrink: 0;
     }
 
     /* Week kaarten */
@@ -210,22 +207,13 @@
     }
 
     .gem-row td.best-2 {
-      color: #f5f7fa;
+      color: #cfd8dc;
       font-weight: bold;
-      text-shadow: 0 0 8px rgba(207, 216, 220, 0.45);
     }
 
     .gem-row td.best-3 {
-      color: #e0a96d;
+      color: #cd7f32;
       font-weight: bold;
-      text-shadow: 0 0 8px rgba(205, 127, 50, 0.3);
-    }
-
-    .rank-sup {
-      font-size: 0.62em;
-      vertical-align: super;
-      margin-left: 1px;
-      font-weight: 700;
     }
 
     .content { display: block; }
@@ -255,15 +243,28 @@ const streefGemiddelde = {
 
 const fallbackWekenData = [
   {
-    datum: '20 maart 2026',
+    datum: '10 april 2026',
     partijen: [
-      [0, 0, 0, 0],
+      [0.366666667, 0.266666667, 0.4, 0.4],
+      [0.2, 0.3, 0.1, 0.5],
+      [0.333333333, 0.366666667, 0.333333333, 0.3],
     ]
   },
   {
-    datum: '13 maart 2026',
+    datum: '3 april 2026',
     partijen: [
-      [0, 0, 0, 0],
+      [0.333333333, 0.3, 0.233333333, 0.7],
+      [0.333333333, 0.233333333, 0.2, 0.566666667],
+      [0.4, 0.166666667, 0.333333333, 0.4],
+    ]
+  },
+  {
+    datum: '27 maart 2026',
+    partijen: [
+      [0.28, 0.192307692, 0.4, null],
+      [0.28, 0.28, 0.28, null],
+      [0.433333333, 0.233333333, 0.5, null],
+      [0.333333333, 0.6, 0.233333333, null],
     ]
   },
   {
@@ -301,15 +302,18 @@ const statusTekst = gebruiktFallback
   : `Excel bron: ${externeData.sourceFile} · bijgewerkt: ${externeData.generatedAt}`;
 
 function gem(arr) {
-  return arr.reduce((a, b) => a + b, 0) / arr.length;
+  const values = arr.filter(v => typeof v === 'number' && !Number.isNaN(v));
+  if (values.length === 0) {
+    return null;
+  }
+  return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
 function fmt(v) {
+  if (v === null || v === undefined || Number.isNaN(v)) {
+    return '-';
+  }
   return v.toFixed(3).replace('.', ',');
-}
-
-function fmtDoel(v) {
-  return v.toFixed(2).replace('.', ',');
 }
 
 function gemPerSpeler(week) {
@@ -328,14 +332,14 @@ function buildRanking() {
     gem: gems[i],
     streef: streefGemiddelde[naam],
   }))
-    .sort((a, b) => b.gem - a.gem);
+    .sort((a, b) => (b.gem ?? -Infinity) - (a.gem ?? -Infinity));
 
   let html = '<div class="totaal-card"><h2>Totaalstand</h2><div class="ranking">';
   ranked.forEach((s, i) => {
     html += `<div class="ranking-item rank-${i+1}">
       <span class="rank-nr">${i+1}</span>
       <span class="rank-naam-wrap">
-        <span class="rank-naam">${s.naam} <span class="rank-doel">(doel: ${fmtDoel(s.streef)})</span></span>
+        <span class="rank-naam">${s.naam} <span class="rank-doel">(doel: ${fmt(s.streef)})</span></span>
       </span>
       <span class="rank-gem">${fmt(s.gem)}</span>
     </div>`;
@@ -346,7 +350,11 @@ function buildRanking() {
 
 function buildWeek(week, idx) {
   const gems = gemPerSpeler(week);
-  const distinctRanks = [...new Set(gems.map(v => Number(v.toFixed(9))))]
+  const distinctRanks = [...new Set(
+    gems
+      .filter(v => typeof v === 'number' && !Number.isNaN(v))
+      .map(v => Number(v.toFixed(9)))
+  )]
     .sort((a, b) => b - a)
     .slice(0, 3);
 
@@ -366,10 +374,10 @@ function buildWeek(week, idx) {
 
   html += `<tr class="gem-row">`;
   gems.forEach((v, i) => {
-    const rankIdx = distinctRanks.indexOf(Number(v.toFixed(9)));
+    const numericValue = typeof v === 'number' && !Number.isNaN(v) ? Number(v.toFixed(9)) : null;
+    const rankIdx = numericValue === null ? -1 : distinctRanks.indexOf(numericValue);
     const cls = rankIdx === 0 ? 'best-1' : (rankIdx === 1 ? 'best-2' : (rankIdx === 2 ? 'best-3' : ''));
-    const sup = rankIdx >= 0 ? `<sup class="rank-sup">${rankIdx + 1}</sup>` : '';
-    html += `<td class="${cls}">${fmt(v)}${sup}</td>`;
+    html += `<td class="${cls}">${fmt(v)}</td>`;
   });
   html += '</tr></tbody></table></div></div>';
   return html;

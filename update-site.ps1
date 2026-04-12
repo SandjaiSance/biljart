@@ -31,6 +31,10 @@ function Get-WeekDataFromWorksheet {
         $dateText = [string]$Worksheet.Cells.Item($row, 1).Text
         if (-not [string]::IsNullOrWhiteSpace($dateText)) {
             $date = [datetime]::Parse($dateText, $culture)
+            if ($date.Year -eq 2025 -and $date.Month -eq 3 -and $date.Day -eq 27) {
+                # Known source typo in workbook: this match day belongs to season 2026.
+                $date = $date.AddYears(1)
+            }
             $currentWeek = [pscustomobject]@{
                 datumSort = $date
                 datum = Format-DutchDate -Date $date
@@ -43,19 +47,21 @@ function Get-WeekDataFromWorksheet {
             continue
         }
 
-        $partij = [System.Collections.Generic.List[double]]::new()
-        $hasAllValues = $true
+        $partij = [System.Collections.Generic.List[object]]::new()
+        $filledCount = 0
         for ($col = 2; $col -le 5; $col++) {
             $value = $Worksheet.Cells.Item($row, $col).Value2
             if ($null -eq $value -or [string]::IsNullOrWhiteSpace([string]$value)) {
-                $hasAllValues = $false
-                break
+                $partij.Add($null)
+                continue
             }
 
             $partij.Add([Math]::Round([double]$value, 9))
+            $filledCount++
         }
 
-        if ($hasAllValues) {
+        # Include rows where at least 3 spelers have a value.
+        if ($filledCount -ge 3) {
             $currentWeek.partijen.Add($partij.ToArray())
         }
     }
