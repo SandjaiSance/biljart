@@ -393,12 +393,33 @@ function toggle(idx) {
 const app = document.getElementById('app');
 const statusEl = document.getElementById('status');
 
+async function cleanupLegacyPwaCache() {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(r => r.unregister()));
+    } catch (e) {
+      // Ignore cleanup errors; rendering should continue.
+    }
+  }
+
+  if ('caches' in window) {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    } catch (e) {
+      // Ignore cache cleanup errors; rendering should continue.
+    }
+  }
+}
+
 function render() {
   statusEl.textContent = statusTekst;
   statusEl.className = gebruiktFallback ? 'status-bar warning' : 'status-bar';
   app.innerHTML = buildRanking() + wekenData.map(buildWeek).join('');
 }
 
+cleanupLegacyPwaCache();
 render();
 </script>
 </body>
