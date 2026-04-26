@@ -122,6 +122,35 @@
       font-size: 1.1rem;
       font-weight: bold;
       color: #a5d6a7;
+      width: 52px;
+      text-align: right;
+    }
+
+    .rank-col-label {
+      font-size: 0.72rem;
+      color: #81c784;
+      text-align: right;
+      margin-bottom: 2px;
+    }
+
+    .rank-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-width: 52px;
+    }
+
+    .rank-maand {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #80cbc4;
+    }
+
+    .rank-divider {
+      width: 1px;
+      align-self: stretch;
+      background: #3a5a3a;
+      margin: 0 2px;
     }
 
     /* Week kaarten */
@@ -231,7 +260,7 @@
 <div id="status" class="status-bar"></div>
 <div id="app"></div>
 
-<script src="site-data.js?v=20260412230441"></script>
+<script src="site-data.js?v=20260426171704"></script>
 <script>
 const spelers = ['sandjai', 'kris', 'bhajo', 'emiel'];
 const streefGemiddelde = {
@@ -325,23 +354,59 @@ function totaalGem() {
   return spelers.map((_, i) => gem(allePartijen.map(p => p[i])));
 }
 
+function maandGem() {
+  // Neem de meest recente datum als referentie, pak alles binnen 31 dagen daarvoor
+  const dutchMonths = [
+    'januari','februari','maart','april','mei','juni',
+    'juli','augustus','september','oktober','november','december'
+  ];
+  function parseDatum(d) {
+    const parts = d.trim().split(' ');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = dutchMonths.indexOf(parts[1].toLowerCase());
+    const year = parseInt(parts[2], 10);
+    if (month === -1) return null;
+    return new Date(year, month, day);
+  }
+  const dates = wekenData.map(w => parseDatum(w.datum)).filter(Boolean);
+  if (dates.length === 0) return spelers.map(() => null);
+  const latest = new Date(Math.max(...dates.map(d => d.getTime())));
+  const cutoff = new Date(latest);
+  cutoff.setDate(cutoff.getDate() - 31);
+  const recentPartijen = wekenData
+    .filter(w => { const d = parseDatum(w.datum); return d && d >= cutoff; })
+    .flatMap(w => w.partijen);
+  return spelers.map((_, i) => gem(recentPartijen.map(p => p[i])));
+}
+
 function buildRanking() {
-  const gems = totaalGem();
+  const gems      = totaalGem();
+  const maandGems = maandGem();
   const ranked = spelers.map((naam, i) => ({
     naam,
-    gem: gems[i],
-    streef: streefGemiddelde[naam],
+    gem:      gems[i],
+    maand:    maandGems[i],
+    streef:   streefGemiddelde[naam],
   }))
     .sort((a, b) => (b.gem ?? -Infinity) - (a.gem ?? -Infinity));
 
-  let html = '<div class="totaal-card"><h2>Totaalstand</h2><div class="ranking">';
+  let html = `<div class="totaal-card"><h2>Totaalstand</h2>
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:4px;padding-right:2px">
+      <div style="min-width:52px;text-align:right;font-size:0.72rem;color:#81c784">seizoen</div>
+      <div style="width:1px"></div>
+      <div style="min-width:52px;text-align:right;font-size:0.72rem;color:#80cbc4">laatste maand</div>
+    </div>
+  <div class="ranking">`;
   ranked.forEach((s, i) => {
     html += `<div class="ranking-item rank-${i+1}">
       <span class="rank-nr">${i+1}</span>
       <span class="rank-naam-wrap">
         <span class="rank-naam">${s.naam} <span class="rank-doel">(doel: ${fmt(s.streef)})</span></span>
       </span>
-      <span class="rank-gem">${fmt(s.gem)}</span>
+      <span class="rank-col"><span class="rank-gem">${fmt(s.gem)}</span></span>
+      <span class="rank-divider"></span>
+      <span class="rank-col"><span class="rank-maand">${fmt(s.maand)}</span></span>
     </div>`;
   });
   html += '</div></div>';
@@ -424,4 +489,10 @@ render();
 </script>
 </body>
 </html>
+
+
+
+
+
+
 
