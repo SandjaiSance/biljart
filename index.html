@@ -248,6 +248,219 @@
     .content { display: block; }
     .content.collapsed { display: none; }
 
+    /* ===== MOBILE RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      header h1 {
+        font-size: 1.3rem;
+      }
+
+      header p {
+        font-size: 0.8rem;
+      }
+
+      /* Mobiel: Ranking items simplificeren */
+      .ranking-item {
+        flex-wrap: wrap;
+        padding: 12px 10px;
+        gap: 8px;
+      }
+
+      .rank-nr {
+        font-size: 1.1rem;
+        width: 20px;
+      }
+
+      .rank-naam-wrap {
+        flex: 1 1 100%;
+        display: flex;
+        flex-direction: column;
+        order: 1;
+      }
+
+      .rank-naam {
+        font-size: 0.95rem;
+      }
+
+      .rank-doel {
+        font-size: 0.8rem;
+        margin-top: 2px;
+      }
+
+      .rank-col {
+        min-width: auto;
+        flex: 1;
+        order: 2;
+      }
+
+      .rank-gem {
+        width: auto;
+        font-size: 1rem;
+      }
+
+      .rank-divider {
+        display: none;
+      }
+
+      .rank-maand {
+        font-size: 1rem;
+      }
+
+      .rank-col-label {
+        font-size: 0.65rem;
+      }
+
+      /* Verbergen van "laatste maand" op hele kleine schermen */
+      .rank-col:nth-of-type(2) {
+        display: none;
+      }
+
+      /* Totaalstand header aanpassen */
+      .totaal-card {
+        padding: 14px;
+        margin-bottom: 18px;
+      }
+
+      .totaal-card h2 {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+      }
+
+      /* Week kaarten */
+      .week-card {
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+
+      .week-datum {
+        font-size: 0.95rem;
+      }
+
+      /* Tabel voor mobiel */
+      table {
+        font-size: 0.8rem;
+      }
+
+      th {
+        padding: 6px 5px;
+        font-size: 0.75rem;
+      }
+
+      td {
+        padding: 6px 5px;
+      }
+
+      tr.gem-row td {
+        font-size: 0.85rem;
+      }
+
+      .status-bar {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+        margin-bottom: 16px;
+      }
+    }
+
+    /* Extra small devices */
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      header {
+        padding: 15px 0 18px;
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+      }
+
+      header p {
+        font-size: 0.75rem;
+      }
+
+      /* Ranking items nog compacter */
+      .ranking {
+        gap: 6px;
+      }
+
+      .ranking-item {
+        padding: 10px 8px;
+        gap: 6px;
+      }
+
+      .rank-nr {
+        font-size: 1rem;
+      }
+
+      .rank-naam {
+        font-size: 0.9rem;
+      }
+
+      .rank-doel {
+        font-size: 0.75rem;
+      }
+
+      .rank-gem {
+        font-size: 0.95rem;
+      }
+
+      .totaal-card {
+        padding: 12px;
+        margin-bottom: 16px;
+      }
+
+      .totaal-card h2 {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+
+      .week-card {
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .week-header {
+        margin-bottom: 12px;
+      }
+
+      .week-datum {
+        font-size: 0.9rem;
+      }
+
+      .week-toggle {
+        font-size: 1rem;
+      }
+
+      /* Tabel extra compact */
+      table {
+        font-size: 0.75rem;
+      }
+
+      th {
+        padding: 5px 3px;
+        font-size: 0.7rem;
+      }
+
+      td {
+        padding: 5px 3px;
+      }
+
+      tr.gem-row td {
+        font-size: 0.8rem;
+      }
+
+      .status-bar {
+        font-size: 0.75rem;
+        padding: 7px 8px;
+        margin-bottom: 14px;
+      }
+    }
+
   </style>
 </head>
 <body>
